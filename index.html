@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TW Mini Cash Wallet</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f6f9;
+            padding: 40px 10px;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .card-header {
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            margin-top: 10px;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard .balance {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .copy-icon {
+            cursor: pointer;
+        }
+
+        .transaction-history h5 {
+            font-weight: bold;
+        }
+
+        .transaction-history p {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Sign Up Form -->
+        <div class="card" id="signupForm">
+            <div class="card-header">TW Mini Cash Wallet</div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select class="form-control" id="country" required>
+                            <option value="">Select Country</option>
+                            <!-- Country options can be dynamically populated -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Mobile Number (optional)</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="Include country code">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" placeholder="Enter your address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pin">Set 6-Digit PIN</label>
+                        <input type="password" class="form-control" id="pin" placeholder="Set a 6-digit PIN" required maxlength="6">
+                    </div>
+                    <button type="button" class="btn btn-primary" id="createAccount">Create Account</button>
+                </form>
+                <p class="mt-3">Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="card" id="loginForm" style="display:none;">
+            <div class="card-header">Login to TW Mini Wallet</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                <button type="button" class="btn btn-primary" id="loginBtn">Login</button>
+                <p class="mt-3">Don't have an account? <a href="#" id="switchToSignup">Sign up here</a></p>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="card dashboard" id="dashboard" style="display:none;">
+            <div class="card-header">Dashboard</div>
+            <div class="card-body text-center">
+                <h5>Welcome, <span id="userName"></span></h5>
+                <p>Your TWD ID: <span id="twdId">123456789</span> <span class="copy-icon">📋</span></p>
+                <div class="balance">
+                    Total Balance: <span id="balance">0</span> <span id="currency">USD</span>
+                </div>
+
+                <!-- Send Money -->
+                <div class="send-money mt-4">
+                    <h5>Send Money</h5>
+                    <div class="form-group">
+                        <label for="recipientTwdId">Recipient TWD ID</label>
+                        <input type="text" class="form-control" id="recipientTwdId" placeholder="Enter recipient's TWD ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="sendAmount">Amount</label>
+                        <input type="number" class="form-control" id="sendAmount" placeholder="Enter amount to send">
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionPin">Enter 6-digit PIN</label>
+                        <input type="password" class="form-control" id="transactionPin" placeholder="Enter your PIN" required>
+                    </div>
+                    <button type="button" class="btn btn-success" id="sendMoneyBtn">Send Money</button>
+                </div>
+
+                <button class="btn logout-btn" id="logout">Logout</button>
+
+                <h5 class="mt-4">Transaction History</h5>
+                <div class="transaction-history" id="transactionHistory">
+                    <!-- Transactions will be shown here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- Custom JS -->
+    <script>
+        // Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDC5LbvaByWvKx6Z5ulhboM9uljVPNMCs8",
+            authDomain: "tw-mini.firebaseapp.com",
+            databaseURL: "https://tw-mini-default-rtdb.firebaseio.com",
+            projectId: "tw-mini",
+            storageBucket: "tw-mini.appspot.com",
+            messagingSenderId: "134130658293",
+            appId: "1:134130658293:web:56d0209de3621d667c8ebc",
+            measurementId: "G-ZCL4KZ9C43"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Check Authentication Status
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('signupForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadUserDashboard(user.uid);
+            } else {
+                document.getElementById('signupForm').style.display = 'block';
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'none';
+            }
+        });
+
+        document.getElementById('switchToLogin').addEventListener('click', function() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+
+        document.getElementById('switchToSignup').addEventListener('click', function() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        });
+
+        // Create Account
+        document.getElementById('createAccount').addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const dob = document.getElementById('dob').value;
+            const country = document.getElementById('country').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const pin = document.getElementById('pin').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+            if (pin.length !== 6) {
+                alert("PIN must be 6 digits long!");
+                return;
+            }
+
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const userId = userCredential.user.uid;
+
+                    // Save user details to the database
+                    firebase.database().ref('users/' + userId).set({
+                        name: name,
+                        dob: dob,
+                        country: country,
+                        phone: phone,
+                        email: email,
+                        address: address,
+                        defaultCurrency: "USD",
+                        balance: 0,
+                        twdId: userId,
+                        pin: pin
+                    });
+                    alert("Account created successfully!");
+
+                    // Redirect to dashboard
+                    document.getElementById('signupForm').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    loadUserDashboard(userId);
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        });
+
+        // Login
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const userId = userCredential.user.uid;
+
+                    // Redirect to dashboard
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    loadUserDashboard(userId);
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        });
+
+        // Load User Dashboard
+        function loadUserDashboard(userId) {
+            firebase.database().ref('users/' + userId).once('value').then((snapshot) => {
+                const userData = snapshot.val();
+                document.getElementById('userName').innerText = userData.name;
+                document.getElementById('twdId').innerText = userData.twdId;
+                document.getElementById('balance').innerText = userData.balance;
+
+                // Load Transaction History
+                loadTransactionHistory(userId);
+            });
+        }
+
+        // Load Transaction History
+        function loadTransactionHistory(userId) {
+            firebase.database().ref('transactions/' + userId).once('value').then((snapshot) => {
+                const transactions = snapshot.val();
+                const historyContainer = document.getElementById('transactionHistory');
+                historyContainer.innerHTML = ''; // Clear previous history
+
+                if (transactions) {
+                    for (const key in transactions) {
+                        const transaction = transactions[key];
+                        const p = document.createElement('p');
+                        p.innerText = `${transaction.date}: ${transaction.amount} USD to ${transaction.recipient}`;
+                        historyContainer.appendChild(p);
+                    }
+                } else {
+                    historyContainer.innerText = "No transactions found.";
+                }
+            });
+        }
+
+        // Send Money
+        document.getElementById('sendMoneyBtn').addEventListener('click', function() {
+            const recipientTwdId = document.getElementById('recipientTwdId').value;
+            const sendAmount = document.getElementById('sendAmount').value;
+            const transactionPin = document.getElementById('transactionPin').value;
+            const userId = firebase.auth().currentUser.uid;
+
+            if (sendAmount <= 0) {
+                alert("Amount must be greater than zero.");
+                return;
+            }
+
+            // Check if the PIN is correct
+            firebase.database().ref('users/' + userId).once('value').then((snapshot) => {
+                const userData = snapshot.val();
+                if (transactionPin !== userData.pin) {
+                    alert("Incorrect PIN.");
+                    return;
+                }
+
+                // Proceed with the transaction
+                firebase.database().ref('users/' + recipientTwdId).once('value').then((recipientSnapshot) => {
+                    const recipientData = recipientSnapshot.val();
+                    if (recipientData) {
+                        const newBalance = userData.balance - sendAmount;
+                        if (newBalance < 0) {
+                            alert("Insufficient balance.");
+                            return;
+                        }
+
+                        // Update balances
+                        firebase.database().ref('users/' + userId).update({ balance: newBalance });
+                        firebase.database().ref('users/' + recipientTwdId).update({
+                            balance: recipientData.balance + parseFloat(sendAmount)
+                        });
+
+                        // Save transaction
+                        const transaction = {
+                            date: new Date().toISOString(),
+                            amount: sendAmount,
+                            recipient: recipientData.name
+                        };
+                        firebase.database().ref('transactions/' + userId).push(transaction);
+                        alert("Transaction successful!");
+
+                        // Reload dashboard
+                        loadUserDashboard(userId);
+                    } else {
+                        alert("Recipient TWD ID not found.");
+                    }
+                });
+            });
+        });
+
+        // Logout
+        document.getElementById('logout').addEventListener('click', function() {
+            firebase.auth().signOut().then(() => {
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'block';
+            }).catch((error) => {
+                alert(error.message);
+            });
+        });
+    </script>
+</body>
+
+</html>
